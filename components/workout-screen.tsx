@@ -162,7 +162,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
             }}
           >
             <Check data-icon="inline-start" />
-            Zakończ trening · {loggedSets} serii
+            Zakończ trening · {loggedSets === 1 ? "1 seria" : loggedSets < 5 ? `${loggedSets} serie` : `${loggedSets} serii`}
           </Button>
         </div>
       </div>

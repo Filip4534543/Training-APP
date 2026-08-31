@@ -85,6 +85,7 @@ export function ChangeExerciseDialog({
           <Input
             value={name}
             onChange={(event) => setName(event.target.value)}
+            onFocus={(event) => event.currentTarget.select()}
             placeholder="Nazwa ćwiczenia"
             autoFocus
             className="h-11 text-base"

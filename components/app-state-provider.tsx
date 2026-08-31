@@ -81,6 +81,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const payload = await fetchState();
+      latest.current = payload.state;
       setState(payload.state);
       setStorage(payload.storage);
       setStatus("ready");
@@ -95,6 +96,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     fetchState()
       .then((payload) => {
         if (cancelled) return;
+        latest.current = payload.state;
         setState(payload.state);
         setStorage(payload.storage);
         setStatus("ready");
@@ -110,10 +112,11 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const queueSave = useCallback((next: AppState) => {
+    latest.current = next;
     setState(next);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      void putState(next)
+      void putState(latest.current)
         .then((payload) => setStorage(payload.storage))
         .catch(() => toast.error("Nie zapisano zmian. Spróbuj jeszcze raz."));
     }, 350);
@@ -121,8 +124,10 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   const persistNow = useCallback(async (next: AppState) => {
     if (timer.current) clearTimeout(timer.current);
+    latest.current = next;
     setState(next);
     const payload = await putState(next);
+    latest.current = payload.state;
     setStorage(payload.storage);
     setState(payload.state);
   }, []);
