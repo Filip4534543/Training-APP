@@ -80,13 +80,14 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col pb-28">
-      <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-md">
-        <div className="flex items-center gap-2 px-3 py-2.5">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
+      <header className="sticky top-0 z-30 border-b border-border/80 bg-background/95 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+        <div className="flex items-center gap-1 px-2 py-2 sm:gap-2 sm:px-3 sm:py-2.5">
           <Button
             type="button"
             variant="ghost"
             size="icon"
+            className="size-10"
             onClick={() => router.push("/")}
             aria-label="Wróć"
           >
@@ -96,7 +97,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
             <p className={cn("text-[11px] font-medium tracking-widest uppercase", tone.text)}>
               {day.name}
             </p>
-            <h1 className="truncate font-heading text-lg leading-none tracking-wide uppercase">
+            <h1 className="truncate font-heading text-base leading-none tracking-wide uppercase sm:text-lg">
               {day.focus}
             </h1>
           </div>
@@ -105,7 +106,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
         <div className={cn("h-1", tone.bar)} />
       </header>
 
-      <div className="grid gap-4 px-4 py-4">
+      <div className="grid gap-3 px-3 py-3 pb-[calc(5.75rem+env(safe-area-inset-bottom))] sm:gap-4 sm:px-4 sm:py-4">
         {workout.exercises.map((exercise, index) => {
           const previous = lastLoggedExercise(
             state.workouts,
@@ -139,12 +140,12 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
         })}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/80 bg-background/95 px-4 py-3 backdrop-blur-md">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="mx-auto flex max-w-3xl items-center gap-2 pb-[env(safe-area-inset-bottom)]">
           <Button
             type="button"
             variant="ghost"
-            className="h-12"
+            className="h-12 px-3"
             onClick={() => {
               discardActive();
               router.push("/");
@@ -155,14 +156,14 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
           </Button>
           <Button
             type="button"
-            className="h-12 flex-1 rounded-full"
+            className="h-12 min-w-0 flex-1 rounded-full text-[13px] sm:text-sm"
             onClick={async () => {
               await finishWorkout(workout.id);
               router.push(`/trening/${dayId}/podsumowanie?id=${workout.id}`);
             }}
           >
             <Check data-icon="inline-start" />
-            Zakończ trening · {loggedSets === 1 ? "1 seria" : loggedSets < 5 ? `${loggedSets} serie` : `${loggedSets} serii`}
+            Zakończ · {loggedSets === 1 ? "1 seria" : loggedSets < 5 ? `${loggedSets} serie` : `${loggedSets} serii`}
           </Button>
         </div>
       </div>

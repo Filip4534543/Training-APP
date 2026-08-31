@@ -39,8 +39,8 @@ export function SummaryScreen({ dayId }: { dayId: DayId }) {
   const progress = compareWorkouts(workout, previous);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 px-4 py-6 pb-24">
-      <div className="flex items-center gap-2">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-3 py-4 sm:gap-5 sm:px-4 sm:py-6">
+      <div className="flex items-start gap-2">
         <Button
           variant="ghost"
           size="icon"
@@ -54,7 +54,7 @@ export function SummaryScreen({ dayId }: { dayId: DayId }) {
           <p className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
             {workout.completedAt ? formatDateTime(workout.completedAt) : "Dziś"}
           </p>
-          <h1 className="font-heading text-3xl leading-none tracking-wide uppercase">
+          <h1 className="font-heading text-2xl leading-tight tracking-wide uppercase sm:text-3xl">
             Progres · {dayLabel(day)}
           </h1>
         </div>
@@ -71,7 +71,7 @@ export function SummaryScreen({ dayId }: { dayId: DayId }) {
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button
-          className="h-11 flex-1"
+          className="h-12 flex-1"
           nativeButton={false}
           onClick={() => startDay(dayId)}
           render={<Link href={`/trening/${dayId}`} />}
@@ -81,7 +81,7 @@ export function SummaryScreen({ dayId }: { dayId: DayId }) {
         </Button>
         <Button
           variant="outline"
-          className="h-11 flex-1"
+          className="h-12 flex-1"
           nativeButton={false}
           render={<Link href="/historia" />}
         >

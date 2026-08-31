@@ -15,13 +15,13 @@ export function HistoryScreen() {
     .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? ""));
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 px-4 py-6 pb-24">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-3 py-4 sm:gap-5 sm:px-4 sm:py-6">
       <header>
         <p className="text-[11px] font-medium tracking-[0.22em] text-muted-foreground uppercase">
           Dziennik
         </p>
-        <h1 className="font-heading text-4xl tracking-wide uppercase">Historia</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="font-heading text-3xl tracking-wide uppercase sm:text-4xl">Historia</h1>
+        <p className="mt-2 hidden text-sm text-muted-foreground sm:block">
           Każdy ukończony trening. Wejdź w podsumowanie, żeby zobaczyć progres względem
           wcześniejszego dnia tego samego planu.
         </p>
@@ -49,7 +49,7 @@ export function HistoryScreen() {
               <Link
                 key={workout.id}
                 href={`/trening/${workout.dayId}/podsumowanie?id=${workout.id}`}
-                className="overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10 transition-colors hover:bg-muted/40"
+                className="overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10 transition-colors active:bg-muted/40 hover:bg-muted/40"
               >
                 <div className={cn("h-1", tone.bar)} />
                 <div className="flex items-start justify-between gap-3 p-4">

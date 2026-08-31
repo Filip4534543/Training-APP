@@ -121,11 +121,19 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overscroll-behavior: none;
+  }
+  button,
+  a,
+  input,
+  [role="button"] {
+    touch-action: manipulation;
   }
   h1,
   h2,
@@ -133,5 +141,6 @@
   .font-heading {
     font-family: var(--font-heading), var(--font-sans), ui-sans-serif, sans-serif;
     font-weight: 500;
+    overflow-wrap: anywhere;
   }
 }

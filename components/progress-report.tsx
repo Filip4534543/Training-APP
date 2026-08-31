@@ -58,11 +58,11 @@ export function ProgressReport({ progress }: { progress: WorkoutProgress }) {
           Porównanie z poprzednim dniem tego planu
         </p>
         {progress.previousDate ? (
-          <h2 className="mt-1 font-heading text-2xl tracking-wide uppercase">
+          <h2 className="mt-1 font-heading text-xl tracking-wide uppercase sm:text-2xl">
             vs {formatDate(progress.previousDate)}
           </h2>
         ) : (
-          <h2 className="mt-1 font-heading text-2xl tracking-wide uppercase">
+          <h2 className="mt-1 font-heading text-xl tracking-wide uppercase sm:text-2xl">
             Pierwszy raz ten dzień
           </h2>
         )}
@@ -110,10 +110,10 @@ function ExerciseProgressCard({ item }: { item: ExerciseProgress }) {
   return (
     <article className="rounded-2xl bg-card p-4 ring-1 ring-foreground/10">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="font-heading text-lg leading-tight tracking-wide uppercase">
+        <h3 className="min-w-0 font-heading text-base leading-tight tracking-wide uppercase sm:text-lg">
           {item.name}
         </h3>
-        <span className={cn("inline-flex items-center gap-1 text-xs font-medium", meta.className)}>
+        <span className={cn("inline-flex shrink-0 items-center gap-1 text-[11px] font-medium sm:text-xs", meta.className)}>
           <Icon className="size-3.5" />
           {meta.label}
         </span>

@@ -21,6 +21,14 @@ export const metadata: Metadata = {
   description:
     "Dziennik siłowy: ciężar, powtórzenia, serie i progres względem poprzedniego dnia treningowego.",
   applicationName: "Training APP",
+  appleWebApp: {
+    capable: true,
+    title: "Training APP",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
@@ -31,6 +39,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

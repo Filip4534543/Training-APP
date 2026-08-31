@@ -31,16 +31,14 @@ export function StepperField({
   }
 
   return (
-    <label className="grid min-w-0 flex-1 gap-1.5">
-      <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-        {label}
-      </span>
-      <div className="flex items-center gap-1">
+    <label className="grid min-w-0 flex-1 gap-0">
+      <span className="sr-only">{label}</span>
+      <div className="flex min-w-0 items-center">
         <Button
           type="button"
           variant="outline"
           size="icon"
-          className="size-11 shrink-0"
+          className="size-10 shrink-0 rounded-r-none sm:size-11"
           onClick={() => nudge(-1)}
           aria-label={`Zmniejsz ${label}`}
         >
@@ -62,10 +60,10 @@ export function StepperField({
               onChange(parsed);
             }}
             className={cn(
-              "h-11 pr-9 text-center font-heading text-xl tracking-wide tabular-nums",
+              "h-10 rounded-none border-x-0 px-1 pr-6 text-center font-heading text-lg tracking-wide tabular-nums sm:h-11 sm:text-xl",
             )}
           />
-          <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-xs text-muted-foreground">
+          <span className="pointer-events-none absolute top-1/2 right-1 -translate-y-1/2 text-[10px] text-muted-foreground sm:right-2 sm:text-xs">
             {suffix}
           </span>
         </div>
@@ -73,7 +71,7 @@ export function StepperField({
           type="button"
           variant="outline"
           size="icon"
-          className="size-11 shrink-0"
+          className="size-10 shrink-0 rounded-l-none sm:size-11"
           onClick={() => nudge(1)}
           aria-label={`Zwiększ ${label}`}
         >

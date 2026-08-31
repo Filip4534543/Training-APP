@@ -67,7 +67,7 @@ export function ChangeExerciseDialog({
         onOpenChange(next);
       }}
     >
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="top-auto bottom-0 left-0 w-full max-w-none translate-x-0 translate-y-0 rounded-b-none rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))] sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl sm:pb-4">
         <DialogHeader>
           <DialogTitle>Zmień ćwiczenie</DialogTitle>
           <DialogDescription>
@@ -104,10 +104,11 @@ export function ChangeExerciseDialog({
               ))}
             </div>
           ) : null}
-          <DialogFooter className="sm:justify-between">
+          <DialogFooter className="max-sm:flex-col-reverse sm:justify-between">
             <Button
               type="button"
               variant="ghost"
+              className="h-11 w-full sm:w-auto"
               onClick={() => {
                 onRestore();
                 onOpenChange(false);
@@ -115,7 +116,9 @@ export function ChangeExerciseDialog({
             >
               Przywróć z planu
             </Button>
-            <Button type="submit">Zapisz i zeruj statystyki</Button>
+            <Button type="submit" className="h-11 w-full sm:w-auto">
+              Zapisz i zeruj statystyki
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
