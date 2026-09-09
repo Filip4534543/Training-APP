@@ -21,10 +21,6 @@ export function HistoryScreen() {
           Dziennik
         </p>
         <h1 className="font-heading text-3xl tracking-wide uppercase sm:text-4xl">Historia</h1>
-        <p className="mt-2 hidden text-sm text-muted-foreground sm:block">
-          Każdy ukończony trening. Wejdź w podsumowanie, żeby zobaczyć progres względem
-          wcześniejszego dnia tego samego planu.
-        </p>
       </header>
 
       {status === "loading" ? (

@@ -26,10 +26,6 @@ export function ExercisesScreen() {
           Plan
         </p>
         <h1 className="font-heading text-3xl tracking-wide uppercase sm:text-4xl">Ćwiczenia</h1>
-        <p className="mt-2 hidden text-sm text-muted-foreground sm:block">
-          Zmień ćwiczenie ręcznie, gdy na sali nie ma sprzętu albo chcesz wariant. Od tego momentu
-          ciężar i powtórzenia liczą się od zera — stary ruch zostaje w historii pod poprzednią nazwą.
-        </p>
       </header>
 
       {status === "loading" ? (
