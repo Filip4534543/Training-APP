@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { History, LayoutGrid, ListChecks } from "lucide-react";
+import { InstallAppButton } from "@/components/install-app-button";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,7 @@ export function AppHeader({ compact = false }: { compact?: boolean }) {
               );
             })}
           </nav>
+          <InstallAppButton />
           <ThemeToggle />
         </div>
       </div>

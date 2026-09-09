@@ -56,13 +56,6 @@ export function HomeScreen() {
         <h1 className="font-heading text-3xl leading-none tracking-wide uppercase sm:text-5xl">
           Wybierz dzień
         </h1>
-        <p className="text-sm text-muted-foreground sm:max-w-xl">
-          <span className="sm:hidden">Ciężar, powtórzenia i progres po treningu.</span>
-          <span className="hidden sm:inline">
-            Cztery dni planu. W każdym ćwiczeniu dopiszesz ciężar i powtórzenia, a serie dodasz lub
-            odejmiesz jednym tapnięciem. Po treningu zobaczysz progres względem poprzedniego razu.
-          </span>
-        </p>
       </section>
 
       {active && getDay(state.plan, active.dayId) ? (

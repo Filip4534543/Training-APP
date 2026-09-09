@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { AppHeader, AppTabBar } from "@/components/app-chrome";
+import { PwaRegister } from "@/components/pwa-register";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -10,6 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <PwaRegister />
       {liveWorkout ? null : <AppHeader />}
       <main
         className={cn(

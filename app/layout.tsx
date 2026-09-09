@@ -26,6 +26,9 @@ export const metadata: Metadata = {
     title: "Training APP",
     statusBarStyle: "default",
   },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
   formatDetection: {
     telephone: false,
   },
