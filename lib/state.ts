@@ -1,4 +1,4 @@
-import { createDefaultState, getDay } from "./plan";
+import { createDefaultState, getDay, isUnilateral } from "./plan";
 import type {
   AppState,
   DayId,
@@ -15,12 +15,18 @@ function uid() {
   return `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
-function emptySets(count: number): SetEntry[] {
-  return Array.from({ length: Math.max(1, count) }, () => ({
+function emptySet(): SetEntry {
+  return {
     id: uid(),
     weight: null,
     reps: null,
-  }));
+    repsLeft: null,
+    repsRight: null,
+  };
+}
+
+function emptySets(count: number): SetEntry[] {
+  return Array.from({ length: Math.max(1, count) }, () => emptySet());
 }
 
 function toWorkoutExercise(template: ExerciseTemplate): WorkoutExercise {
@@ -31,9 +37,20 @@ function toWorkoutExercise(template: ExerciseTemplate): WorkoutExercise {
     setsMax: template.setsMax,
     repsMin: template.repsMin,
     repsMax: template.repsMax,
+    unilateral: template.unilateral,
     note: template.note,
     since: template.since,
     sets: emptySets(template.setsMin),
+  };
+}
+
+function normalizeSet(set: Partial<SetEntry>): SetEntry {
+  return {
+    id: typeof set.id === "string" && set.id ? set.id : uid(),
+    weight: set.weight ?? null,
+    reps: set.reps ?? null,
+    repsLeft: set.repsLeft ?? null,
+    repsRight: set.repsRight ?? null,
   };
 }
 
@@ -41,7 +58,7 @@ export function isAppState(value: unknown): value is AppState {
   if (!value || typeof value !== "object") return false;
   const candidate = value as AppState;
   return (
-    candidate.version === 1 &&
+    candidate.version === 2 &&
     Array.isArray(candidate.plan) &&
     Array.isArray(candidate.workouts)
   );
@@ -55,24 +72,33 @@ export function mergeWithDefaults(raw: unknown): AppState {
     if (!saved) return day;
     return {
       ...day,
-      ...saved,
-      id: day.id,
-      tone: day.tone,
-      exercises:
-        saved.exercises?.length > 0
-          ? saved.exercises.map((exercise) => ({
-              ...exercise,
-              name: exercise.name?.trim() || "Ćwiczenie",
-              setsMin: Math.max(1, exercise.setsMin || 1),
-              setsMax: Math.max(exercise.setsMin || 1, exercise.setsMax || exercise.setsMin || 1),
-            }))
-          : day.exercises,
+      exercises: day.exercises.map((exercise) => {
+        const savedExercise = saved.exercises.find((item) => item.id === exercise.id);
+        if (!savedExercise) return exercise;
+        const name = savedExercise.name?.trim() || exercise.name;
+        return {
+          ...exercise,
+          name,
+          since: savedExercise.since,
+          unilateral: savedExercise.unilateral ?? isUnilateral({ ...exercise, name }),
+        };
+      }),
     };
   });
+
   return {
-    version: 1,
+    version: 2,
     plan,
-    workouts: raw.workouts ?? [],
+    workouts: (raw.workouts ?? [])
+      .filter((workout) => workout.dayId === 1 || workout.dayId === 2)
+      .map((workout) => ({
+        ...workout,
+        exercises: workout.exercises.map((exercise) => ({
+          ...exercise,
+          unilateral: exercise.unilateral ?? isUnilateral(exercise),
+          sets: (exercise.sets ?? []).map(normalizeSet),
+        })),
+      })),
     activeWorkoutId: raw.activeWorkoutId ?? null,
   };
 }
@@ -88,9 +114,9 @@ export function startWorkout(state: AppState, dayId: DayId): AppState {
 
   const workout: Workout = {
     id: uid(),
-    dayId,
     startedAt: new Date().toISOString(),
     completedAt: null,
+    dayId,
     exercises: day.exercises.map(toWorkoutExercise),
   };
 
@@ -144,7 +170,7 @@ export function updateSet(
   workoutId: string,
   slotId: string,
   setId: string,
-  patch: Partial<Pick<SetEntry, "weight" | "reps">>,
+  patch: Partial<Pick<SetEntry, "weight" | "reps" | "repsLeft" | "repsRight">>,
 ): AppState {
   return patchExercise(state, workoutId, slotId, (exercise) => ({
     ...exercise,
@@ -163,6 +189,8 @@ export function addSet(state: AppState, workoutId: string, slotId: string): AppS
           id: uid(),
           weight: last?.weight ?? null,
           reps: last?.reps ?? null,
+          repsLeft: last?.repsLeft ?? null,
+          repsRight: last?.repsRight ?? null,
         },
       ],
     };
@@ -193,11 +221,12 @@ export function completeWorkout(state: AppState, workoutId: string): AppState {
   };
 }
 
-export function changeExercise(
+function applyExerciseChange(
   state: AppState,
   dayId: DayId,
   slotId: string,
   name: string,
+  unilateral: boolean,
 ): AppState {
   const trimmed = name.trim();
   if (!trimmed) return state;
@@ -208,7 +237,7 @@ export function changeExercise(
     return {
       ...day,
       exercises: day.exercises.map((exercise) =>
-        exercise.id === slotId ? { ...exercise, name: trimmed, since } : exercise,
+        exercise.id === slotId ? { ...exercise, name: trimmed, since, unilateral } : exercise,
       ),
     };
   });
@@ -224,7 +253,14 @@ export function changeExercise(
               ...exercise,
               name: trimmed,
               since,
-              sets: exercise.sets.map((set) => ({ ...set, weight: null, reps: null })),
+              unilateral,
+              sets: exercise.sets.map((set) => ({
+                ...set,
+                weight: null,
+                reps: null,
+                repsLeft: null,
+                repsRight: null,
+              })),
             }
           : exercise,
       ),
@@ -234,11 +270,26 @@ export function changeExercise(
   return { ...state, plan, workouts };
 }
 
+export function changeExercise(
+  state: AppState,
+  dayId: DayId,
+  slotId: string,
+  name: string,
+): AppState {
+  return applyExerciseChange(state, dayId, slotId, name, isUnilateral({ name }));
+}
+
 export function restoreDefaultExercise(state: AppState, dayId: DayId, slotId: string): AppState {
   const defaults = createDefaultState();
   const original = getDay(defaults.plan, dayId)?.exercises.find((exercise) => exercise.id === slotId);
   if (!original) return state;
-  return changeExercise(state, dayId, slotId, original.name);
+  return applyExerciseChange(
+    state,
+    dayId,
+    slotId,
+    original.name,
+    original.unilateral ?? false,
+  );
 }
 
 export function getWorkout(state: AppState, workoutId: string | null) {

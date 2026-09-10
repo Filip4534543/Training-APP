@@ -1,4 +1,4 @@
-export type DayId = 1 | 2 | 3 | 4;
+export type DayId = 1 | 2;
 
 export type DayTone = "rose" | "sky" | "emerald" | "amber";
 
@@ -9,6 +9,7 @@ export type ExerciseTemplate = {
   setsMax: number;
   repsMin: number;
   repsMax: number;
+  unilateral?: boolean;
   note?: string;
   /** ISO date — when the name last changed, stats start from this point. */
   since?: string;
@@ -26,6 +27,8 @@ export type SetEntry = {
   id: string;
   weight: number | null;
   reps: number | null;
+  repsLeft: number | null;
+  repsRight: number | null;
 };
 
 export type WorkoutExercise = {
@@ -35,6 +38,7 @@ export type WorkoutExercise = {
   setsMax: number;
   repsMin: number;
   repsMax: number;
+  unilateral?: boolean;
   note?: string;
   since?: string;
   sets: SetEntry[];
@@ -49,7 +53,7 @@ export type Workout = {
 };
 
 export type AppState = {
-  version: 1;
+  version: 2;
   plan: DayPlan[];
   workouts: Workout[];
   activeWorkoutId: string | null;
@@ -64,14 +68,21 @@ export type StatePayload = {
 
 export type ExerciseTrend = "up" | "down" | "same" | "new";
 
+export type BestSet = {
+  weight: number;
+  reps: number;
+  repsLeft?: number;
+  repsRight?: number;
+};
+
 export type ExerciseProgress = {
   slotId: string;
   name: string;
   trend: ExerciseTrend;
   currentVolume: number;
   previousVolume: number | null;
-  currentBest: { weight: number; reps: number } | null;
-  previousBest: { weight: number; reps: number } | null;
+  currentBest: BestSet | null;
+  previousBest: BestSet | null;
   currentSets: number;
   previousSets: number | null;
   volumeDelta: number | null;

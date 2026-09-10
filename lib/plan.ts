@@ -1,19 +1,27 @@
-import type { AppState, DayPlan } from "./types";
+import type { AppState, DayId, DayPlan } from "./types";
 
 export const DEFAULT_PLAN: DayPlan[] = [
   {
     id: 1,
     name: "Dzień 1",
-    focus: "Klata + brzuch",
+    focus: "Plan A",
     tone: "rose",
     exercises: [
       {
         id: "d1-bench",
-        name: "Wyciskanie sztangi na ławce płaskiej",
+        name: "Wyciskanie na klatę",
+        setsMin: 4,
+        setsMax: 4,
+        repsMin: 6,
+        repsMax: 10,
+      },
+      {
+        id: "d1-pullup",
+        name: "Podciąganie z ciężarem",
         setsMin: 4,
         setsMax: 4,
         repsMin: 5,
-        repsMax: 8,
+        repsMax: 10,
       },
       {
         id: "d1-decline-pushup",
@@ -24,35 +32,44 @@ export const DEFAULT_PLAN: DayPlan[] = [
         repsMax: 15,
       },
       {
-        id: "d1-shoulder-press",
-        name: "Wyciskanie na barki na wyciągu",
+        id: "d1-cable-row",
+        name: "Wiosłowanie na wyciągu",
         setsMin: 3,
         setsMax: 3,
         repsMin: 8,
         repsMax: 12,
       },
       {
-        id: "d1-triceps",
-        name: "Prostowanie ramion na wyciągu",
-        setsMin: 2,
-        setsMax: 3,
-        repsMin: 10,
-        repsMax: 15,
-      },
-      {
-        id: "d1-curl-db",
-        name: "Uginanie ramion z hantlami",
-        setsMin: 2,
-        setsMax: 3,
-        repsMin: 10,
-        repsMax: 15,
-      },
-      {
-        id: "d1-hanging-leg",
-        name: "Unoszenie nóg w zwisie",
+        id: "d1-kb-squat",
+        name: "Przysiady z kettlem",
         setsMin: 3,
         setsMax: 3,
         repsMin: 8,
+        repsMax: 12,
+      },
+      {
+        id: "d1-cable-curl",
+        name: "Biceps na wyciągu (jednorącz)",
+        setsMin: 3,
+        setsMax: 3,
+        repsMin: 10,
+        repsMax: 15,
+        unilateral: true,
+      },
+      {
+        id: "d1-triceps",
+        name: "Triceps na wyciągu",
+        setsMin: 3,
+        setsMax: 3,
+        repsMin: 10,
+        repsMax: 15,
+      },
+      {
+        id: "d1-crunch",
+        name: "Brzuszki",
+        setsMin: 3,
+        setsMax: 3,
+        repsMin: 10,
         repsMax: 15,
       },
     ],
@@ -60,161 +77,58 @@ export const DEFAULT_PLAN: DayPlan[] = [
   {
     id: 2,
     name: "Dzień 2",
-    focus: "Plecy",
+    focus: "Plan B",
     tone: "sky",
     exercises: [
       {
+        id: "d2-ohp",
+        name: "OHP",
+        setsMin: 4,
+        setsMax: 4,
+        repsMin: 6,
+        repsMax: 10,
+      },
+      {
         id: "d2-pullup",
-        name: "Podciąganie",
+        name: "Podciąganie z ciężarem",
         setsMin: 4,
         setsMax: 4,
         repsMin: 5,
         repsMax: 10,
       },
       {
-        id: "d2-cable-row",
-        name: "Wiosłowanie na wyciągu",
-        setsMin: 3,
-        setsMax: 3,
-        repsMin: 8,
-        repsMax: 12,
-      },
-      {
-        id: "d2-db-row",
-        name: "Wiosłowanie hantlem jednorącz",
-        setsMin: 3,
-        setsMax: 3,
-        repsMin: 8,
-        repsMax: 12,
-      },
-      {
-        id: "d2-face-pull",
-        name: "Face pull na wyciągu",
-        setsMin: 2,
-        setsMax: 3,
-        repsMin: 12,
-        repsMax: 15,
-      },
-      {
-        id: "d2-barbell-curl",
-        name: "Uginanie ramion ze sztangą",
-        setsMin: 3,
-        setsMax: 3,
-        repsMin: 8,
-        repsMax: 12,
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Dzień 3",
-    focus: "Nogi + brzuch",
-    tone: "emerald",
-    exercises: [
-      {
-        id: "d3-squat",
-        name: "Przysiady ze sztangą",
-        setsMin: 4,
-        setsMax: 4,
-        repsMin: 5,
-        repsMax: 8,
-      },
-      {
-        id: "d3-rdl",
-        name: "Rumuński martwy ciąg",
+        id: "d2-bench",
+        name: "Wyciskanie na klatę",
         setsMin: 3,
         setsMax: 3,
         repsMin: 6,
         repsMax: 10,
       },
       {
-        id: "d3-split-squat",
-        name: "Bulgarian split squat",
+        id: "d2-single-row",
+        name: "Wiosłowanie na wyciągu jednorącz",
         setsMin: 3,
         setsMax: 3,
         repsMin: 8,
         repsMax: 12,
-        note: "na nogę",
+        unilateral: true,
       },
       {
-        id: "d3-calf",
-        name: "Wspięcia na palce",
+        id: "d2-lateral-raise",
+        name: "Wznosy bokiem na wyciągu jednorącz",
         setsMin: 3,
         setsMax: 3,
         repsMin: 10,
         repsMax: 15,
+        unilateral: true,
       },
       {
-        id: "d3-crunch",
-        name: "Spięcia brzucha na wyciągu",
+        id: "d2-cable-leg-raise",
+        name: "Unoszenie nóg na wyciągu",
         setsMin: 3,
         setsMax: 3,
         repsMin: 10,
         repsMax: 15,
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: "Dzień 4",
-    focus: "Full body",
-    tone: "amber",
-    exercises: [
-      {
-        id: "d4-squat",
-        name: "Przysiady ze sztangą",
-        setsMin: 3,
-        setsMax: 3,
-        repsMin: 6,
-        repsMax: 8,
-      },
-      {
-        id: "d4-bench",
-        name: "Wyciskanie sztangi na ławce płaskiej",
-        setsMin: 3,
-        setsMax: 3,
-        repsMin: 6,
-        repsMax: 8,
-      },
-      {
-        id: "d4-pullup",
-        name: "Podciąganie",
-        setsMin: 3,
-        setsMax: 3,
-        repsMin: 6,
-        repsMax: 10,
-      },
-      {
-        id: "d4-cable-row",
-        name: "Wiosłowanie na wyciągu",
-        setsMin: 3,
-        setsMax: 3,
-        repsMin: 8,
-        repsMax: 12,
-      },
-      {
-        id: "d4-shoulder-press",
-        name: "Wyciskanie na barki na wyciągu",
-        setsMin: 2,
-        setsMax: 3,
-        repsMin: 8,
-        repsMax: 12,
-      },
-      {
-        id: "d4-barbell-curl",
-        name: "Uginanie ramion ze sztangą",
-        setsMin: 2,
-        setsMax: 2,
-        repsMin: 10,
-        repsMax: 12,
-      },
-      {
-        id: "d4-triceps",
-        name: "Prostowanie ramion na wyciągu",
-        setsMin: 2,
-        setsMax: 2,
-        repsMin: 10,
-        repsMax: 12,
       },
     ],
   },
@@ -230,14 +144,12 @@ export const EXTRA_EXERCISE_SUGGESTIONS = [
   "Martwy ciąg",
   "Ściąganie drążka wyciągu",
   "Hip thrust",
-  "Wspięcia na palce siedząc",
   "Plank",
-  "Allahy na wyciągu",
 ];
 
 export function createDefaultState(): AppState {
   return {
-    version: 1,
+    version: 2,
     plan: structuredClone(DEFAULT_PLAN),
     workouts: [],
     activeWorkoutId: null,
@@ -246,4 +158,15 @@ export function createDefaultState(): AppState {
 
 export function getDay(plan: DayPlan[], dayId: number) {
   return plan.find((day) => day.id === dayId) ?? null;
+}
+
+export function parseDayId(value: string): DayId | null {
+  const day = Number(value);
+  if (day === 1 || day === 2) return day;
+  return null;
+}
+
+export function isUnilateral(exercise: { unilateral?: boolean; name?: string }) {
+  if (exercise.unilateral) return true;
+  return /jednor[aą]cz/i.test(exercise.name ?? "");
 }

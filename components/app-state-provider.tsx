@@ -38,7 +38,7 @@ type AppStateContextValue = {
     workoutId: string,
     slotId: string,
     setId: string,
-    patch: { weight?: number | null; reps?: number | null },
+    patch: { weight?: number | null; reps?: number | null; repsLeft?: number | null; repsRight?: number | null },
   ) => void;
   addExerciseSet: (workoutId: string, slotId: string) => void;
   removeExerciseSet: (workoutId: string, slotId: string, setId: string) => void;

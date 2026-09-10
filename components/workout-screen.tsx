@@ -10,8 +10,8 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { DAY_TONES, dayLabel } from "@/lib/format";
-import { getDay } from "@/lib/plan";
-import { lastLoggedExercise } from "@/lib/progress";
+import { getDay, isUnilateral } from "@/lib/plan";
+import { filledSets, lastLoggedExercise, setHasReps } from "@/lib/progress";
 import { getWorkout } from "@/lib/state";
 import type { DayId, ExerciseTemplate } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -75,7 +75,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
 
   const tone = DAY_TONES[day.tone];
   const loggedSets = workout.exercises.reduce(
-    (sum, exercise) => sum + exercise.sets.filter((set) => set.reps && set.reps > 0).length,
+    (sum, exercise) => sum + filledSets(exercise.sets, isUnilateral(exercise)).length,
     0,
   );
 
@@ -114,7 +114,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
             exercise.since,
             workout.id,
           );
-          const lastSet = previous?.sets.filter((set) => set.reps && set.reps > 0).at(-1);
+          const lastSet = previous?.sets.filter((set) => setHasReps(set, isUnilateral(previous))).at(-1);
           const template = day.exercises.find((item) => item.id === exercise.slotId) ?? {
             ...exercise,
             id: exercise.slotId,
@@ -126,7 +126,12 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
               exercise={exercise}
               lastHint={
                 lastSet
-                  ? { weight: lastSet.weight, reps: lastSet.reps }
+                  ? {
+                      weight: lastSet.weight,
+                      reps: lastSet.reps,
+                      repsLeft: lastSet.repsLeft,
+                      repsRight: lastSet.repsRight,
+                    }
                   : null
               }
               onChangeSet={(setId, patch) =>

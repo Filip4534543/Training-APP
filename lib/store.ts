@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { createDefaultState } from "./plan";
-import { mergeWithDefaults } from "./state";
+import { isAppState, mergeWithDefaults } from "./state";
 import type { AppState, StatePayload, StorageBackend } from "./types";
 
 const STORE_NAME = "training-app";
@@ -51,8 +51,10 @@ async function getBlobStore(): Promise<BlobLike | null> {
 
 async function readLocal(): Promise<AppState | null> {
   try {
-    const raw = await readFile(LOCAL_FILE, "utf8");
-    return mergeWithDefaults(JSON.parse(raw));
+    const raw = JSON.parse(await readFile(LOCAL_FILE, "utf8"));
+    const state = mergeWithDefaults(raw);
+    if (!isAppState(raw)) await writeLocal(state);
+    return state;
   } catch {
     return null;
   }
@@ -68,10 +70,14 @@ export async function loadState(): Promise<StatePayload> {
   if (store) {
     try {
       const raw = await store.get(STATE_KEY, { type: "json" });
-      return {
-        state: raw ? mergeWithDefaults(raw) : createDefaultState(),
-        storage: "netlify-blobs",
-      };
+      if (!raw) {
+        return { state: createDefaultState(), storage: "netlify-blobs" };
+      }
+      const state = mergeWithDefaults(raw);
+      if (!isAppState(raw)) {
+        await store.setJSON(STATE_KEY, state);
+      }
+      return { state, storage: "netlify-blobs" };
     } catch (error) {
       console.warn("Netlify Blobs odczyt nieudany, fallback do pliku lokalnego.", error);
     }

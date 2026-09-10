@@ -1,6 +1,6 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Sparkles } from "lucide-react";
 import { formatDate, formatKg, formatVolume, signed } from "@/lib/format";
-import type { ExerciseProgress, ExerciseTrend, WorkoutProgress } from "@/lib/types";
+import type { BestSet, ExerciseProgress, ExerciseTrend, WorkoutProgress } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const TREND: Record<
@@ -34,14 +34,16 @@ function BestLine({
   best,
 }: {
   label: string;
-  best: { weight: number; reps: number } | null;
+  best: BestSet | null;
 }) {
   return (
     <p className="text-xs text-muted-foreground">
       {label}:{" "}
       {best ? (
         <span className="text-foreground">
-          {formatKg(best.weight)} kg × {best.reps}
+          {best.repsLeft != null || best.repsRight != null
+            ? `${formatKg(best.weight)} kg × L ${best.repsLeft ?? "—"} / P ${best.repsRight ?? "—"}`
+            : `${formatKg(best.weight)} kg × ${best.reps}`}
         </span>
       ) : (
         "brak"

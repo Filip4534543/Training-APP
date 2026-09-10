@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const liveWorkout = /^\/trening\/[1-4]$/.test(pathname);
+  const liveWorkout = /^\/trening\/[1-2]$/.test(pathname);
 
   return (
     <>
