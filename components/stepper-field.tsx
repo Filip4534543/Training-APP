@@ -3,7 +3,6 @@
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 
 type Props = {
   label: string;
@@ -12,6 +11,7 @@ type Props = {
   min?: number;
   suffix: string;
   placeholder?: string;
+  lastValue?: string | null;
   onChange: (value: number | null) => void;
 };
 
@@ -22,6 +22,7 @@ export function StepperField({
   min = 0,
   suffix,
   placeholder,
+  lastValue,
   onChange,
 }: Props) {
   function nudge(direction: -1 | 1) {
@@ -31,7 +32,7 @@ export function StepperField({
   }
 
   return (
-    <label className="grid min-w-0 flex-1 gap-0">
+    <label className="grid min-w-0 flex-1 gap-0.5">
       <span className="sr-only">{label}</span>
       <div className="flex min-w-0 items-center">
         <Button
@@ -48,7 +49,7 @@ export function StepperField({
           <Input
             inputMode="decimal"
             value={value ?? ""}
-            placeholder={placeholder ?? "0"}
+            placeholder={placeholder ?? lastValue ?? "0"}
             onChange={(event) => {
               const raw = event.target.value.replace(",", ".");
               if (raw === "") {
@@ -59,9 +60,7 @@ export function StepperField({
               if (Number.isNaN(parsed)) return;
               onChange(parsed);
             }}
-            className={cn(
-              "h-10 rounded-none border-x-0 px-1 pr-6 text-center font-heading text-lg tracking-wide tabular-nums sm:h-11 sm:text-xl",
-            )}
+            className="h-10 rounded-none border-x-0 px-1 pr-6 text-center font-heading text-lg tracking-wide tabular-nums sm:h-11 sm:text-xl"
           />
           <span className="pointer-events-none absolute top-1/2 right-1 -translate-y-1/2 text-[10px] text-muted-foreground sm:right-2 sm:text-xs">
             {suffix}
@@ -78,6 +77,11 @@ export function StepperField({
           <Plus className="size-4" />
         </Button>
       </div>
+      {lastValue ? (
+        <span className="text-center text-[10px] font-medium tracking-wide text-muted-foreground">
+          ost. {lastValue}
+        </span>
+      ) : null}
     </label>
   );
 }

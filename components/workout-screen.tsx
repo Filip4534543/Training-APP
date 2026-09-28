@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { DAY_TONES, dayLabel } from "@/lib/format";
 import { getDay, isUnilateral } from "@/lib/plan";
-import { filledSets, lastLoggedExercise, setHasReps } from "@/lib/progress";
+import { filledSets, lastLoggedExercise } from "@/lib/progress";
 import { getWorkout } from "@/lib/state";
 import type { DayId, ExerciseTemplate } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
   const router = useRouter();
   const {
     state,
+    profile,
     startDay,
     discardActive,
     patchSet,
@@ -32,16 +33,16 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
   } = useAppState();
   const [renaming, setRenaming] = useState<ExerciseTemplate | null>(null);
 
-  const day = getDay(state.plan, dayId);
+  const day = getDay(profile.plan, dayId);
   const workout = useMemo(() => {
-    const active = getWorkout(state, state.activeWorkoutId);
+    const active = getWorkout(state, profile.activeWorkoutId);
     if (active && active.dayId === dayId) return active;
     return null;
-  }, [dayId, state]);
+  }, [dayId, profile.activeWorkoutId, state]);
 
   const catalog = useMemo(
-    () => state.plan.flatMap((item) => item.exercises.map((exercise) => exercise.name)),
-    [state.plan],
+    () => profile.plan.flatMap((item) => item.exercises.map((exercise) => exercise.name)),
+    [profile.plan],
   );
 
   if (status === "loading" || !day) {
@@ -109,12 +110,11 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
       <div className="grid gap-3 px-3 py-3 pb-[calc(5.75rem+env(safe-area-inset-bottom))] sm:gap-4 sm:px-4 sm:py-4">
         {workout.exercises.map((exercise, index) => {
           const previous = lastLoggedExercise(
-            state.workouts,
+            profile.workouts,
             exercise.name,
             exercise.since,
             workout.id,
           );
-          const lastSet = previous?.sets.filter((set) => setHasReps(set, isUnilateral(previous))).at(-1);
           const template = day.exercises.find((item) => item.id === exercise.slotId) ?? {
             ...exercise,
             id: exercise.slotId,
@@ -124,16 +124,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
               key={exercise.slotId}
               index={index}
               exercise={exercise}
-              lastHint={
-                lastSet
-                  ? {
-                      weight: lastSet.weight,
-                      reps: lastSet.reps,
-                      repsLeft: lastSet.repsLeft,
-                      repsRight: lastSet.repsRight,
-                    }
-                  : null
-              }
+              previousExercise={previous}
               onChangeSet={(setId, patch) =>
                 patchSet(workout.id, exercise.slotId, setId, patch)
               }

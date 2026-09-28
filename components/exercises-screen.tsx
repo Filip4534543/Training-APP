@@ -10,13 +10,13 @@ import type { DayPlan, ExerciseTemplate } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export function ExercisesScreen() {
-  const { state, renameExercise, resetExercise, status } = useAppState();
+  const { profile, renameExercise, resetExercise, status } = useAppState();
   const [editing, setEditing] = useState<{ day: DayPlan; exercise: ExerciseTemplate } | null>(
     null,
   );
   const catalog = useMemo(
-    () => state.plan.flatMap((day) => day.exercises.map((exercise) => exercise.name)),
-    [state.plan],
+    () => profile.plan.flatMap((day) => day.exercises.map((exercise) => exercise.name)),
+    [profile.plan],
   );
 
   return (
@@ -32,7 +32,7 @@ export function ExercisesScreen() {
         <p className="text-sm text-muted-foreground">Wczytuję plan…</p>
       ) : (
         <div className="grid gap-4">
-          {state.plan.map((day) => {
+          {profile.plan.map((day) => {
             const tone = DAY_TONES[day.tone];
             return (
               <section key={day.id} className="overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10">
@@ -45,7 +45,7 @@ export function ExercisesScreen() {
                 </div>
                 <ul className="divide-y divide-border/70 pt-2">
                   {day.exercises.map((exercise) => {
-                    const last = lastLoggedExercise(state.workouts, exercise.name, exercise.since);
+                    const last = lastLoggedExercise(profile.workouts, exercise.name, exercise.since);
                     return (
                       <li key={exercise.id} className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4">
                         <div className="min-w-0">

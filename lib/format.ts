@@ -80,6 +80,25 @@ export function formatDateTime(iso: string) {
   }).format(new Date(iso));
 }
 
+export function formatShortDate(iso: string) {
+  return new Intl.DateTimeFormat("pl-PL", {
+    day: "numeric",
+    month: "short",
+  }).format(new Date(iso));
+}
+
+export function toDatetimeLocalValue(iso = new Date().toISOString()) {
+  const date = new Date(iso);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+export function fromDatetimeLocalValue(value: string) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return new Date().toISOString();
+  return parsed.toISOString();
+}
+
 export function formatWeekday(iso = new Date().toISOString()) {
   return new Intl.DateTimeFormat("pl-PL", { weekday: "long" }).format(new Date(iso));
 }

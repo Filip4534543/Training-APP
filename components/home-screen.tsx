@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils";
 
 export function HomeScreen() {
   const router = useRouter();
-  const { state, status, error, reload, storage, startDay } = useAppState();
-  const active = getWorkout(state, state.activeWorkoutId);
+  const { state, profile, status, error, reload, storage, startDay } = useAppState();
+  const active = getWorkout(state, profile.activeWorkoutId);
 
   function openDay(dayId: DayId) {
     const next = startDay(dayId);
@@ -54,11 +54,11 @@ export function HomeScreen() {
           {formatWeekday()}
         </p>
         <h1 className="font-heading text-3xl leading-none tracking-wide uppercase sm:text-5xl">
-          Wybierz dzień
+          {profile.name}, wybierz dzień
         </h1>
       </section>
 
-      {active && getDay(state.plan, active.dayId) ? (
+      {active && getDay(profile.plan, active.dayId) ? (
         <Link
           href={`/trening/${active.dayId}`}
           className="flex min-h-14 items-center justify-between gap-3 rounded-2xl bg-foreground px-4 py-3.5 text-background"
@@ -66,7 +66,7 @@ export function HomeScreen() {
           <div className="min-w-0">
             <p className="text-[11px] tracking-widest uppercase opacity-70">Trening w toku</p>
             <p className="truncate font-heading text-lg tracking-wide uppercase sm:text-xl">
-              {dayLabel(getDay(state.plan, active.dayId)!)}
+              {dayLabel(getDay(profile.plan, active.dayId)!)}
             </p>
           </div>
           <ArrowRight className="size-5 shrink-0" />
@@ -74,11 +74,11 @@ export function HomeScreen() {
       ) : null}
 
       <div className="grid gap-3">
-        {state.plan.map((day) => (
+        {profile.plan.map((day) => (
           <DayCard
             key={day.id}
             day={day}
-            last={lastCompletedForDay(state.workouts, day.id)}
+            last={lastCompletedForDay(profile.workouts, day.id)}
             onStart={() => openDay(day.id)}
           />
         ))}
@@ -91,12 +91,12 @@ export function HomeScreen() {
           <HardDrive className="size-3.5" />
         )}
         Zapis: {storage === "netlify-blobs" ? "Netlify Blobs" : "lokalny plik (dev)"}
-        {state.workouts.filter((item) => item.completedAt).length > 0 ? (
+        {profile.workouts.filter((item) => item.completedAt).length > 0 ? (
           <>
             {" "}
             · ostatni trening{" "}
             {formatDateTime(
-              [...state.workouts]
+              [...profile.workouts]
                 .filter((item) => item.completedAt)
                 .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? ""))[0]
                 .completedAt!,

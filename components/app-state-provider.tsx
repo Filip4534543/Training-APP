@@ -12,26 +12,33 @@ import {
 import { toast } from "sonner";
 import { createDefaultState } from "@/lib/plan";
 import {
+  activeProfile,
+  addBodyWeight,
   addSet,
   changeExercise,
   completeWorkout,
+  deleteBodyWeight,
+  deleteWorkout,
   discardActiveWorkout,
   removeSet,
   restoreDefaultExercise,
+  setActiveProfile,
   startWorkout,
   updateSet,
 } from "@/lib/state";
-import type { AppState, DayId, StorageBackend } from "@/lib/types";
+import type { AppState, DayId, Profile, ProfileId, StorageBackend } from "@/lib/types";
 
 type Status = "loading" | "ready" | "error";
 
 type AppStateContextValue = {
   state: AppState;
+  profile: Profile;
   storage: StorageBackend;
   status: Status;
   error: string | null;
   reload: () => Promise<void>;
   persistNow: (next: AppState) => Promise<void>;
+  switchProfile: (profileId: ProfileId) => void;
   startDay: (dayId: DayId) => AppState;
   discardActive: () => void;
   patchSet: (
@@ -43,8 +50,11 @@ type AppStateContextValue = {
   addExerciseSet: (workoutId: string, slotId: string) => void;
   removeExerciseSet: (workoutId: string, slotId: string, setId: string) => void;
   finishWorkout: (workoutId: string) => Promise<AppState>;
+  removeWorkout: (workoutId: string) => void;
   renameExercise: (dayId: DayId, slotId: string, name: string) => void;
   resetExercise: (dayId: DayId, slotId: string) => void;
+  logWeight: (weight: number, recordedAt?: string) => void;
+  removeWeight: (entryId: string) => void;
 };
 
 const AppStateContext = createContext<AppStateContextValue | null>(null);
@@ -132,14 +142,20 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setState(payload.state);
   }, []);
 
+  const profile = useMemo(() => activeProfile(state), [state]);
+
   const value = useMemo<AppStateContextValue>(
     () => ({
       state,
+      profile,
       storage,
       status,
       error,
       reload,
       persistNow,
+      switchProfile: (profileId) => {
+        queueSave(setActiveProfile(latest.current, profileId));
+      },
       startDay: (dayId) => {
         const next = startWorkout(latest.current, dayId);
         queueSave(next);
@@ -158,6 +174,10 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         toast.success("Trening zapisany.");
         return next;
       },
+      removeWorkout: (workoutId) => {
+        queueSave(deleteWorkout(latest.current, workoutId));
+        toast.success("Trening usunięty z historii.");
+      },
       renameExercise: (dayId, slotId, name) => {
         queueSave(changeExercise(latest.current, dayId, slotId, name));
         toast.message("Ćwiczenie zmienione. Statystyki liczą się od nowa.");
@@ -166,8 +186,16 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         queueSave(restoreDefaultExercise(latest.current, dayId, slotId));
         toast.message("Przywrócono ćwiczenie z planu. Statystyki od zera.");
       },
+      logWeight: (weight, recordedAt) => {
+        queueSave(addBodyWeight(latest.current, weight, recordedAt));
+        toast.success("Zapisano wagę.");
+      },
+      removeWeight: (entryId) => {
+        queueSave(deleteBodyWeight(latest.current, entryId));
+        toast.success("Usunięto pomiar.");
+      },
     }),
-    [error, persistNow, queueSave, reload, state, status, storage],
+    [error, persistNow, profile, queueSave, reload, state, status, storage],
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

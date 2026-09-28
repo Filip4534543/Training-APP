@@ -13,13 +13,13 @@ import type { DayId } from "@/lib/types";
 
 export function SummaryScreen({ dayId }: { dayId: DayId }) {
   const searchParams = useSearchParams();
-  const { state, startDay } = useAppState();
+  const { profile, startDay } = useAppState();
   const workoutId = searchParams.get("id");
   const workout =
-    state.workouts.find((item) => item.id === workoutId) ??
-    state.workouts.find((item) => item.dayId === dayId && item.completedAt) ??
+    profile.workouts.find((item) => item.id === workoutId) ??
+    profile.workouts.find((item) => item.dayId === dayId && item.completedAt) ??
     null;
-  const day = getDay(state.plan, dayId);
+  const day = getDay(profile.plan, dayId);
 
   if (!workout || !day) {
     return (
@@ -35,7 +35,7 @@ export function SummaryScreen({ dayId }: { dayId: DayId }) {
     );
   }
 
-  const previous = lastCompletedForDay(state.workouts, dayId, workout.id);
+  const previous = lastCompletedForDay(profile.workouts, dayId, workout.id);
   const progress = compareWorkouts(workout, previous);
 
   return (

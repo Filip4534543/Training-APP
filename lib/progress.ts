@@ -2,8 +2,10 @@ import { isUnilateral } from "./plan";
 import { exerciseKey } from "./format";
 import type {
   BestSet,
+  DayId,
   ExerciseProgress,
   ExerciseTrend,
+  FirstSetPoint,
   SetEntry,
   Workout,
   WorkoutExercise,
@@ -94,6 +96,52 @@ export function lastLoggedExercise(
     if (found && filledSets(found.sets, isUnilateral(found)).length > 0) return found;
   }
   return null;
+}
+
+export function previousSetForIndex(previous: WorkoutExercise | null, setIndex: number) {
+  if (!previous) return null;
+  const unilateral = isUnilateral(previous);
+  const filled = filledSets(previous.sets, unilateral);
+  if (filled.length === 0) return null;
+  const matching = previous.sets[setIndex];
+  if (matching && (matching.weight != null || setHasReps(matching, unilateral))) {
+    return matching;
+  }
+  return filled[Math.min(setIndex, filled.length - 1)] ?? null;
+}
+
+export function firstSetSeries(
+  workouts: Workout[],
+  dayId: DayId,
+  slotId: string,
+  since?: string,
+): FirstSetPoint[] {
+  return workouts
+    .filter(
+      (workout) =>
+        workout.dayId === dayId &&
+        workout.completedAt &&
+        (!since || (workout.completedAt ?? "") >= since),
+    )
+    .sort((a, b) => (a.completedAt ?? "").localeCompare(b.completedAt ?? ""))
+    .flatMap((workout) => {
+      const exercise = workout.exercises.find((item) => item.slotId === slotId);
+      const first = exercise?.sets[0];
+      if (!exercise || !first) return [];
+      const unilateral = isUnilateral(exercise);
+      if (first.weight == null && !setHasReps(first, unilateral)) return [];
+      return [
+        {
+          workoutId: workout.id,
+          at: workout.completedAt!,
+          weight: first.weight,
+          reps: first.reps,
+          repsLeft: first.repsLeft,
+          repsRight: first.repsRight,
+          unilateral,
+        },
+      ];
+    });
 }
 
 function trendFor(current: number, previous: number | null): ExerciseTrend {
