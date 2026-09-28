@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit, Oswald } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { AppStateProvider } from "@/components/app-state-provider";
+import { PwaRegister } from "@/components/pwa-register";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <ThemeProvider>
           <AppStateProvider>
+            <PwaRegister />
             <AppShell>{children}</AppShell>
             <Toaster position="top-center" />
           </AppStateProvider>

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Cloud, HardDrive, LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 import { useAppState } from "@/components/app-state-provider";
 import { Button } from "@/components/ui/button";
 import { DAY_TONES, dayLabel, formatDateTime, formatSetsScheme, formatWeekday } from "@/lib/format";
@@ -19,6 +20,12 @@ export function HomeScreen() {
   const active = getWorkout(state, profile.activeWorkoutId);
 
   function openDay(dayId: DayId) {
+    const day = getDay(profile.plan, dayId);
+    if (!day?.exercises.length) {
+      toast.error("Ten dzień nie ma ćwiczeń. Dodaj je w zakładce Ćwiczenia.");
+      router.push("/cwiczenia");
+      return;
+    }
     const next = startDay(dayId);
     router.push(`/trening/${dayId}`);
     return next;

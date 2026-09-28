@@ -4,7 +4,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepperField } from "@/components/stepper-field";
 import { formatKg, formatSetsScheme } from "@/lib/format";
-import { isUnilateral } from "@/lib/plan";
+import { exerciseKind, isBodyweight, isUnilateral } from "@/lib/plan";
 import { filledSets, previousSetForIndex } from "@/lib/progress";
 import type { WorkoutExercise } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ type Props = {
   index: number;
   exercise: WorkoutExercise;
   previousExercise?: WorkoutExercise | null;
+  bodyWeightKg?: number | null;
   onChangeSet: (
     setId: string,
     patch: {
@@ -40,14 +41,21 @@ export function ExerciseBlock({
   index,
   exercise,
   previousExercise,
+  bodyWeightKg,
   onChangeSet,
   onAddSet,
   onRemoveSet,
   onRename,
 }: Props) {
+  const kind = exerciseKind(exercise);
   const unilateral = isUnilateral(exercise);
   const logged = filledSets(exercise.sets, unilateral).length;
   const headerHint = previousExercise ? lastHintLabel(previousExercise, unilateral) : null;
+  const massHint = isBodyweight(exercise)
+    ? bodyWeightKg != null
+      ? `Masa ciała: ${formatKg(bodyWeightKg)} kg`
+      : "Brak wagi ciała — zapisz ją w zakładce Waga."
+    : null;
 
   return (
     <section className="rounded-2xl bg-card ring-1 ring-foreground/10">
@@ -64,6 +72,7 @@ export function ExerciseBlock({
           ) : (
             <p className="mt-1 text-xs text-muted-foreground">Brak historii — od tej sesji.</p>
           )}
+          {massHint ? <p className="mt-0.5 text-xs text-muted-foreground">{massHint}</p> : null}
         </div>
         <Button
           type="button"
@@ -91,7 +100,7 @@ export function ExerciseBlock({
             <span className="text-center">Ciężar · L / P</span>
           ) : (
             <>
-              <span className="text-center">Ciężar</span>
+            <span className="text-center">{kind === "bodyweight" ? "Masa ciała" : "Ciężar"}</span>
               <span className="text-center">Powt.</span>
             </>
           )}
@@ -100,6 +109,8 @@ export function ExerciseBlock({
         <div className="divide-y divide-border/70">
           {exercise.sets.map((set, setIndex) => {
             const last = previousSetForIndex(previousExercise ?? null, setIndex);
+            const fallbackWeight =
+              last?.weight ?? (kind === "bodyweight" ? (bodyWeightKg ?? null) : null);
             return (
               <div key={set.id} className="grid gap-1.5 px-2 py-1.5 sm:px-3">
                 <div
@@ -118,8 +129,14 @@ export function ExerciseBlock({
                     value={set.weight}
                     step={2.5}
                     suffix="kg"
-                    placeholder={last?.weight != null ? formatKg(last.weight) : "0"}
-                    lastValue={last?.weight != null ? `${formatKg(last.weight)} kg` : null}
+                    placeholder={fallbackWeight != null ? formatKg(fallbackWeight) : "0"}
+                    lastValue={
+                      last?.weight != null
+                        ? `${formatKg(last.weight)} kg`
+                        : kind === "bodyweight" && bodyWeightKg != null
+                          ? `${formatKg(bodyWeightKg)} kg`
+                          : null
+                    }
                     onChange={(weight) => onChangeSet(set.id, { weight })}
                   />
                   {unilateral ? (

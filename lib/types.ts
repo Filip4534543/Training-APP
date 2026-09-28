@@ -1,8 +1,10 @@
-export type DayId = 1 | 2;
+export type DayId = number;
 
 export type DayTone = "rose" | "sky" | "emerald" | "amber";
 
 export type ProfileId = "filip" | "patrycja";
+
+export type ExerciseKind = "normal" | "unilateral" | "bodyweight";
 
 export type ExerciseTemplate = {
   id: string;
@@ -11,6 +13,7 @@ export type ExerciseTemplate = {
   setsMax: number;
   repsMin: number;
   repsMax: number;
+  kind: ExerciseKind;
   unilateral?: boolean;
   note?: string;
   /** ISO date — when the name last changed, stats start from this point. */
@@ -40,6 +43,7 @@ export type WorkoutExercise = {
   setsMax: number;
   repsMin: number;
   repsMax: number;
+  kind: ExerciseKind;
   unilateral?: boolean;
   note?: string;
   since?: string;
@@ -67,6 +71,7 @@ export type Profile = {
   workouts: Workout[];
   activeWorkoutId: string | null;
   bodyWeights: BodyWeightEntry[];
+  patternHash: string | null;
 };
 
 export type AppState = {
@@ -124,4 +129,13 @@ export type FirstSetPoint = {
   repsLeft: number | null;
   repsRight: number | null;
   unilateral: boolean;
+};
+
+export type ExercisePatch = {
+  name?: string;
+  kind?: ExerciseKind;
+  setsMin?: number;
+  setsMax?: number;
+  repsMin?: number;
+  repsMax?: number;
 };

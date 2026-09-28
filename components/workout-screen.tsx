@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { DAY_TONES, dayLabel } from "@/lib/format";
 import { getDay, isUnilateral } from "@/lib/plan";
 import { filledSets, lastLoggedExercise } from "@/lib/progress";
-import { getWorkout } from "@/lib/state";
+import { getWorkout, latestBodyWeight } from "@/lib/state";
 import type { DayId, ExerciseTemplate } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +27,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
     addExerciseSet,
     removeExerciseSet,
     finishWorkout,
-    renameExercise,
+    updateExerciseDetails,
     resetExercise,
     status,
   } = useAppState();
@@ -125,6 +125,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
               index={index}
               exercise={exercise}
               previousExercise={previous}
+              bodyWeightKg={latestBodyWeight(profile)}
               onChangeSet={(setId, patch) =>
                 patchSet(workout.id, exercise.slotId, setId, patch)
               }
@@ -173,7 +174,7 @@ export function WorkoutScreen({ dayId }: { dayId: DayId }) {
           day={day}
           exercise={renaming}
           catalog={catalog}
-          onConfirm={(name) => renameExercise(dayId, renaming.id, name)}
+          onConfirm={(patch) => updateExerciseDetails(dayId, renaming.id, patch)}
           onRestore={() => resetExercise(dayId, renaming.id)}
         />
       ) : null}

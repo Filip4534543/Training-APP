@@ -1,4 +1,4 @@
-import { isUnilateral } from "./plan";
+import { exerciseKind } from "./plan";
 import type { DayPlan, DayTone, ExerciseTemplate, WorkoutExercise } from "./types";
 
 export const DAY_TONES: Record<
@@ -34,7 +34,7 @@ export const DAY_TONES: Record<
 export function formatSetsScheme(
   exercise: Pick<
     ExerciseTemplate | WorkoutExercise,
-    "setsMin" | "setsMax" | "repsMin" | "repsMax" | "note" | "unilateral" | "name"
+    "setsMin" | "setsMax" | "repsMin" | "repsMax" | "note" | "unilateral" | "name" | "kind"
   >,
 ) {
   const sets =
@@ -45,8 +45,12 @@ export function formatSetsScheme(
     exercise.repsMin === exercise.repsMax
       ? `${exercise.repsMin}`
       : `${exercise.repsMin}–${exercise.repsMax}`;
-  const side = isUnilateral(exercise) ? " L/P" : "";
-  return exercise.note ? `${sets} × ${reps} ${exercise.note}${side}` : `${sets} × ${reps}${side}`;
+  const kind = exerciseKind(exercise);
+  const extra =
+    kind === "unilateral" ? " L/P" : kind === "bodyweight" ? " masa ciała" : "";
+  return exercise.note
+    ? `${sets} × ${reps} ${exercise.note}${extra}`
+    : `${sets} × ${reps}${extra}`;
 }
 
 export function formatKg(value: number | null) {

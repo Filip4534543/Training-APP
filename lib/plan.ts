@@ -1,4 +1,4 @@
-import type { AppState, DayId, DayPlan, Profile, ProfileId } from "./types";
+import type { AppState, DayId, DayPlan, DayTone, ExerciseKind, Profile, ProfileId } from "./types";
 
 function exercise(
   id: string,
@@ -6,9 +6,20 @@ function exercise(
   sets: number,
   repsMin: number,
   repsMax: number,
-  extra?: { unilateral?: boolean; note?: string },
+  extra?: { kind?: ExerciseKind; unilateral?: boolean; note?: string },
 ) {
-  return { id, name, setsMin: sets, setsMax: sets, repsMin, repsMax, ...extra };
+  const kind: ExerciseKind = extra?.kind ?? (extra?.unilateral ? "unilateral" : "normal");
+  return {
+    id,
+    name,
+    setsMin: sets,
+    setsMax: sets,
+    repsMin,
+    repsMax,
+    kind,
+    unilateral: kind === "unilateral",
+    note: extra?.note,
+  };
 }
 
 export const FILIP_PLAN: DayPlan[] = [
@@ -23,7 +34,7 @@ export const FILIP_PLAN: DayPlan[] = [
       exercise("d1-decline-pushup", "Pompki z nogami na podwyższeniu", 3, 8, 15),
       exercise("d1-cable-row", "Wiosłowanie na wyciągu", 3, 8, 12),
       exercise("d1-kb-squat", "Przysiady z kettlem", 3, 8, 12),
-      exercise("d1-cable-curl", "Biceps na wyciągu (jednorącz)", 3, 10, 15, { unilateral: true }),
+      exercise("d1-cable-curl", "Biceps na wyciągu (jednorącz)", 3, 10, 15, { kind: "unilateral" }),
       exercise("d1-triceps", "Triceps na wyciągu", 3, 10, 15),
       exercise("d1-crunch", "Brzuszki", 3, 10, 15),
     ],
@@ -37,9 +48,9 @@ export const FILIP_PLAN: DayPlan[] = [
       exercise("d2-ohp", "OHP", 4, 6, 10),
       exercise("d2-pullup", "Podciąganie z ciężarem", 4, 5, 10),
       exercise("d2-bench", "Wyciskanie na klatę", 3, 6, 10),
-      exercise("d2-single-row", "Wiosłowanie na wyciągu jednorącz", 3, 8, 12, { unilateral: true }),
+      exercise("d2-single-row", "Wiosłowanie na wyciągu jednorącz", 3, 8, 12, { kind: "unilateral" }),
       exercise("d2-lateral-raise", "Wznosy bokiem na wyciągu jednorącz", 3, 10, 15, {
-        unilateral: true,
+        kind: "unilateral",
       }),
       exercise("d2-cable-leg-raise", "Unoszenie nóg na wyciągu", 3, 10, 15),
     ],
@@ -57,12 +68,12 @@ export const PATRYCJA_PLAN: DayPlan[] = [
       exercise("p1-adductor", "Adductor", 3, 10, 15),
       exercise("p1-leg-press", "Suwnica", 4, 8, 12),
       exercise("p1-hip-thrust", "Hip thrust", 4, 8, 12),
-      exercise("p1-rdl", "RDL", 4, 8, 12),
+      exercise("p1-rdl", "RDL", 4, 8, 12, { kind: "unilateral" }),
       exercise("p1-sumo-squat", "Przysiady sumo z ciężarem", 4, 8, 12),
       exercise("p1-roman-chair", "Rzymska ławeczka", 3, 10, 15),
-      exercise("p1-straight-abduction", "Odwodzenie nóg prosto", 3, 10, 15),
+      exercise("p1-straight-abduction", "Odwodzenie nóg prosto", 3, 10, 15, { kind: "unilateral" }),
       exercise("p1-supported-leg-raise", "Podciąganie nóg w oparciu", 3, 10, 15),
-      exercise("p1-transverse", "Poprzecznie", 3, 10, 15),
+      exercise("p1-transverse", "Odwodzenie nóg poprzecznie", 3, 10, 15, { kind: "unilateral" }),
     ],
   },
   {
@@ -117,6 +128,7 @@ export function emptyProfile(seed: Pick<Profile, "id" | "name" | "plan">): Profi
     workouts: [],
     activeWorkoutId: null,
     bodyWeights: [],
+    patternHash: null,
   };
 }
 
@@ -138,13 +150,48 @@ export function getDay(plan: DayPlan[], dayId: number) {
 
 export function parseDayId(value: string): DayId | null {
   const day = Number(value);
-  if (day === 1 || day === 2) return day;
-  return null;
+  if (!Number.isInteger(day) || day <= 0) return null;
+  return day;
 }
 
-export function isUnilateral(exercise: { unilateral?: boolean; name?: string }) {
-  if (exercise.unilateral) return true;
-  return /jednor[aą]cz/i.test(exercise.name ?? "");
+export function exerciseKind(exercise: {
+  kind?: ExerciseKind;
+  unilateral?: boolean;
+  name?: string;
+}): ExerciseKind {
+  if (exercise.kind === "normal" || exercise.kind === "unilateral" || exercise.kind === "bodyweight") {
+    return exercise.kind;
+  }
+  if (exercise.unilateral || /jednor[aą]cz/i.test(exercise.name ?? "")) return "unilateral";
+  return "normal";
+}
+
+export function isUnilateral(exercise: {
+  kind?: ExerciseKind;
+  unilateral?: boolean;
+  name?: string;
+}) {
+  return exerciseKind(exercise) === "unilateral";
+}
+
+export function isBodyweight(exercise: {
+  kind?: ExerciseKind;
+  unilateral?: boolean;
+  name?: string;
+}) {
+  return exerciseKind(exercise) === "bodyweight";
+}
+
+export const DAY_TONE_CYCLE: DayTone[] = ["rose", "sky", "emerald", "amber"];
+
+export function nextDayTone(plan: DayPlan[]): DayTone {
+  return DAY_TONE_CYCLE[plan.length % DAY_TONE_CYCLE.length]!;
+}
+
+export function kindLabel(kind: ExerciseKind) {
+  if (kind === "unilateral") return "Na 2 strony";
+  if (kind === "bodyweight") return "Masa ciała";
+  return "Normalne";
 }
 
 export function isProfileId(value: unknown): value is ProfileId {
